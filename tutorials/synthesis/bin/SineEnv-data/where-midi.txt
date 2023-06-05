@@ -1,0 +1,8 @@
+galaxy: https://www.vgmusic.com/file/98ed5cf946dba46cdcc7b589e87596a8.html
+lake: https://www.purezc.net/forums/index.php?showtopic=74076
+rest: https://www.khinsider.com/midi/snes/kirby-super-star
+yoshi: https://www.khinsider.com/midi/snes/super-mario-world
+
+other notes:
+midi2freq and freq2midi formula: https://newt.phys.unsw.edu.au/jw/notes.html
+general midi stuff: https://www.music.mcgill.ca/~ich/classes/mumt306/StandardMIDIfileformat.html

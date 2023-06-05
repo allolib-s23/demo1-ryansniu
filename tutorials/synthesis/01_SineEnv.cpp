@@ -31,7 +31,7 @@ public:
 
   // Additional members
   Mesh mMesh;
-
+  
   // Initialize voice. This function will only be called once per voice when
   // it is created. Voices will be reused if they are idle.
   void init() override {
@@ -41,7 +41,7 @@ public:
     mAmpEnv.sustainPoint(2); // Make point 2 sustain until a release is issued
 
     // We have the mesh be a sphere
-    addDisc(mMesh, 1.0, 30);
+    addRect(mMesh, 1.0, 1.0);
 
     // This is a quick way to create parameters for the voice. Trigger
     // parameters are meant to be set only when the voice starts, i.e. they
@@ -88,17 +88,15 @@ public:
     // Get the paramter values on every video frame, to apply changes to the
     // current instance
     float frequency = getInternalParameterValue("frequency");
-    float amplitude = getInternalParameterValue("amplitude");
-    // Now draw
+    float midiNote = round(12 * log(frequency / 440.0) / log(2)) + 69;
+
     g.pushMatrix();
-    // Move x according to frequency, y according to amplitude
-    g.translate(frequency / 200 - 3, amplitude, -8);
-    // Scale in the x and y directions according to amplitude
-    g.scale(1 - amplitude, amplitude, 1);
-    // Set the color. Red and Blue according to sound amplitude and Green
-    // according to frequency. Alpha fixed to 0.4
-    g.color(mEnvFollow.value(), frequency / 1000, mEnvFollow.value() * 10, 0.4);
+
+    g.translate(0.05 * (midiNote - 64), 0.0, -4);
+    g.scale(0.05, mEnvFollow.value() * 128.0, 1);
+    g.color(0.0, midiNote / 128, (1.0 - midiNote / 128) * (1.0 - midiNote / 128));
     g.draw(mMesh);
+
     g.popMatrix();
   }
 
@@ -132,8 +130,9 @@ public:
     imguiInit();
 
     // Play example sequence. Comment this line to start from scratch
-    synthManager.synthSequencer().playSequence("synth1.synthSequence");
+    synthManager.synthSequencer().playSequence("raining.synthSequence");
     synthManager.synthRecorder().verbose(true);
+    synthManager.synthSequencer().setTime(0.0f);
   }
 
   // The audio callback function. Called when audio hardware requires data
@@ -152,42 +151,8 @@ public:
   // The graphics callback function.
   void onDraw(Graphics &g) override {
     g.clear();
-    // Render the synth's graphics
+
     synthManager.render(g);
-
-    // GUI is drawn here
-    imguiDraw();
-  }
-
-  // Whenever a key is pressed, this function is called
-  bool onKeyDown(Keyboard const &k) override {
-    if (ParameterGUI::usingKeyboard()) { // Ignore keys if GUI is using
-                                         // keyboard
-      return true;
-    }
-    if (k.shift()) {
-      // If shift pressed then keyboard sets preset
-      int presetNumber = asciiToIndex(k.key());
-      synthManager.recallPreset(presetNumber);
-    } else {
-      // Otherwise trigger note for polyphonic synth
-      int midiNote = asciiToMIDI(k.key());
-      if (midiNote > 0) {
-        synthManager.voice()->setInternalParameterValue(
-            "frequency", ::pow(2.f, (midiNote - 69.f) / 12.f) * 432.f);
-        synthManager.triggerOn(midiNote);
-      }
-    }
-    return true;
-  }
-
-  // Whenever a key is released this function is called
-  bool onKeyUp(Keyboard const &k) override {
-    int midiNote = asciiToMIDI(k.key());
-    if (midiNote > 0) {
-      synthManager.triggerOff(midiNote);
-    }
-    return true;
   }
 
   void onExit() override { imguiShutdown(); }
