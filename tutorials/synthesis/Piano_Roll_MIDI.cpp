@@ -245,7 +245,7 @@ public:
     addRect(aMesh, 1, 1);
 
     // Play example sequence. Comment this line to start from scratch
-    synthManager.synthSequencer().playSequence("fairy.synthSequence");
+    synthManager.synthSequencer().playSequence("pool.synthSequence");
     synthManager.synthRecorder().verbose(true);
     synthManager.synthSequencer().setTime(0.0f);
   }
